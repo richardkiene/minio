@@ -660,6 +660,110 @@ func (t *tritonObjects) DeleteObject(ctx context.Context, bucket, object string)
 	return nil
 }
 
+// NewMultipartUpload upload object in multiple parts, uses Manta's MPU API.
+// Large files can range in size from 5MB to 10TB. All of the parts except the
+// last one must be at least 5MB in size. The last part must contain at least one byte.
+// For more information - https://github.com/joyent/rfd/blob/master/rfd/0065/README.md
+func (t *tritonObjects) NewMultipartUpload(ctx context.Context, bucket string, object string, metadata map[string]string, o minio.ObjectOptions) (string, error) {
+	mpuBody := storage.CreateMpuBody{
+		ObjectPath: path.Join(mantaRoot, bucket, object),
+	}
+
+	createMpuInput := &storage.CreateMpuInput{
+		DurabilityLevel: 2,
+		Body:            mpuBody,
+		ForceInsert:     true,
+	}
+
+	response := &storage.CreateMpuOutput{}
+	response, err := t.client.Objects().CreateMultipartUpload(context.Background(), createMpuInput)
+	if err != nil {
+		logger.LogIf(ctx, err)
+		return "", err
+	}
+
+	return response.Id, nil
+}
+
+// PutObjectPart puts a single part of a multipart upload
+func (t *tritonObjects) PutObjectPart(ctx context.Context, bucket string, key string, uploadID string, partNumber int, r *minio.PutObjReader, opts minio.ObjectOptions) (minio.PartInfo, error) {
+	data := r.Reader
+	uploadPartInput := &storage.UploadPartInput{
+		Id:		     uploadID,
+		PartNum:	     uint64(partNumber) - 1,
+		ObjectReader:	     data,
+	}
+
+	response := &storage.UploadPartOutput{}
+	response, err := t.client.Objects().UploadPart(ctx, uploadPartInput)
+	if err != nil {
+		logger.LogIf(ctx, err)
+		return minio.PartInfo{}, err
+	}
+
+	return minio.PartInfo{
+		PartNumber:   partNumber - 1,
+		ETag:	      response.Part,
+		LastModified: minio.UTCNow(),
+		Size:         data.Size(),
+	}, nil
+
+}
+
+func (t *tritonObjects) CompleteMultipartUpload(ctx context.Context, bucket string, object string, uploadID string, uploadedParts []minio.CompletePart, opts minio.ObjectOptions) (minio.ObjectInfo, error) {
+	var parts []string
+	for _, uploadedPart := range uploadedParts {
+		parts = append(parts, uploadedPart.ETag)
+	}
+
+	commitBody := storage.CommitMpuBody{
+		Parts: parts,
+	}
+
+	commitMpuInput := &storage.CommitMpuInput{
+		Id:		     uploadID,
+		Body:                commitBody,
+	}
+
+	err := t.client.Objects().CommitMultipartUpload(context.Background(), commitMpuInput)
+	if err != nil {
+		logger.LogIf(ctx, err)
+		return minio.ObjectInfo{}, err
+	}
+
+	return t.GetObjectInfo(ctx, bucket, object, minio.ObjectOptions{})
+}
+
+
+func (t *tritonObjects) ListObjectParts(ctx context.Context, bucket string, object string, uploadID string, partNumberMarker int, maxParts int) (minio.ListPartsInfo, error) {
+	listMpuPartsInput := &storage.ListMpuPartsInput{
+		Id: uploadID,
+	}
+
+	lpi := minio.ListPartsInfo{
+		Bucket:               bucket,
+		Object:               object,
+		UploadID:             uploadID,
+		MaxParts:             maxParts,
+		PartNumberMarker:     partNumberMarker,
+	}
+
+	listMpuPartsOutput, err := t.client.Objects().ListMultipartUploadParts(ctx, listMpuPartsInput)
+	if err != nil {
+		logger.LogIf(ctx, err)
+		return lpi, err
+	}
+
+	for _, part := range listMpuPartsOutput.Parts {
+		lpi.Parts = append(lpi.Parts, minio.PartInfo{
+			PartNumber: part.PartNumber,
+			ETag: part.ETag,
+			Size: part.Size,
+		})
+	}
+
+	return lpi, nil
+}
 // IsCompressionSupported returns whether compression is applicable for this layer.
 func (t *tritonObjects) IsCompressionSupported() bool {
 	return false

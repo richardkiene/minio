@@ -504,34 +504,34 @@
 			"revisionTime": "2016-01-12T19:33:35Z"
 		},
 		{
-			"checksumSHA1": "nqqPhmRxnQuOQgTXuHt2gvwnE/k=",
+			"checksumSHA1": "vJeTadofDvwoK58EkF4PafgyuZY=",
 			"path": "github.com/joyent/triton-go",
-			"revision": "5c3d94f2ab55045221fa2eb42830576397b7b89c",
-			"revisionTime": "2019-01-04T16:14:19Z"
+			"revision": "025f6e6aeefd9f15d302421152569ef84083816f",
+			"revisionTime": "2019-01-12T17:21:58Z"
 		},
 		{
 			"checksumSHA1": "yNrArK8kjkVkU0bunKlemd6dFkE=",
 			"path": "github.com/joyent/triton-go/authentication",
-			"revision": "5c3d94f2ab55045221fa2eb42830576397b7b89c",
-			"revisionTime": "2019-01-04T16:14:19Z"
+			"revision": "025f6e6aeefd9f15d302421152569ef84083816f",
+			"revisionTime": "2019-01-12T17:21:58Z"
 		},
 		{
 			"checksumSHA1": "nppv6i9E2yqdbQ6qJkahCwELSeI=",
 			"path": "github.com/joyent/triton-go/client",
-			"revision": "5c3d94f2ab55045221fa2eb42830576397b7b89c",
-			"revisionTime": "2019-01-04T16:14:19Z"
+			"revision": "025f6e6aeefd9f15d302421152569ef84083816f",
+			"revisionTime": "2019-01-12T17:21:58Z"
 		},
 		{
 			"checksumSHA1": "d/Py6j/uMgOAFNFGpsQrNnSsO+k=",
 			"path": "github.com/joyent/triton-go/errors",
-			"revision": "5c3d94f2ab55045221fa2eb42830576397b7b89c",
-			"revisionTime": "2019-01-04T16:14:19Z"
+			"revision": "025f6e6aeefd9f15d302421152569ef84083816f",
+			"revisionTime": "2019-01-12T17:21:58Z"
 		},
 		{
-			"checksumSHA1": "PxFRa/EEDDMmzd6Lt1npvtxLvfc=",
+			"checksumSHA1": "hThRhlheleZ0ZcGjRyTMW9zyFDI=",
 			"path": "github.com/joyent/triton-go/storage",
-			"revision": "5c3d94f2ab55045221fa2eb42830576397b7b89c",
-			"revisionTime": "2019-01-04T16:14:19Z"
+			"revision": "025f6e6aeefd9f15d302421152569ef84083816f",
+			"revisionTime": "2019-01-12T17:21:58Z"
 		},
 		{
 			"checksumSHA1": "mA7isU/nIAT5ytwIzK65H0vlVqI=",

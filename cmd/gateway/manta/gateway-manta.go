@@ -402,7 +402,7 @@ func (t *tritonObjects) ListObjects(ctx context.Context, bucket, prefix, marker,
 			result.Prefixes = append(result.Prefixes, obj.Name+delimiter)
 		} else {
 			result.Objects = append(result.Objects, minio.ObjectInfo{
-				Name:    obj.Name,
+				Name:    prefix + obj.Name,
 				Size:    int64(obj.Size),
 				ModTime: obj.ModifiedTime,
 				ETag:    obj.ETag,
